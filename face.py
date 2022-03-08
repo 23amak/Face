@@ -37,10 +37,8 @@ data_dir = 'C:/Users/foggy/Documents/img_align_celeba'
 import pickle as pkl
 import matplotlib.pyplot as plt
 import numpy as np
-import problem_unittests as tests
 #import helper
 
-get_ipython().run_line_magic('matplotlib', 'inline')
 
 
 # ## Visualize the CelebA Data
