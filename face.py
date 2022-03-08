@@ -32,7 +32,7 @@
 # In[2]:
 
 
-data_dir = 'processed_celeba_small/'
+data_dir = 'C:/Users/foggy/Documents/img_align_celeba'
 
 import pickle as pkl
 import matplotlib.pyplot as plt
