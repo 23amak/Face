@@ -19,7 +19,7 @@ import PIL
 
 tf.__version__
 
-assert os.path.isfile("C://Users//foggy//Documents//img_align_celeba")
+assert os.path.isfile(r"C:/Users/foggy/Documents/img_align_celeba")
 
 def load_image( infilename ) :
     img = PIL.Image.open( infilename )
