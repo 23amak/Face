@@ -19,10 +19,9 @@ import PIL
 
 tf.__version__
 
-#path = "C:/Users/foggy/Documents/img_align_celeba"
+path = "C:/Users/foggy/Documents/img_align_celeba"
 
-path = r"C:/Users/foggy/Documents/img_align_celeba"
-assert os.path.isfile(path)
+assert os.path.isfile(r"C:/Users/foggy/Documents/img_align_celeba")
 with open(path, "r") as f:
   pass
 
