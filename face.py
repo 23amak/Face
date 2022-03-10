@@ -19,7 +19,7 @@ import PIL
 
 tf.__version__
 
-path = "C:/Users/foggy/Documents/img_align_celeba"
+path = "C:\Users\foggy\Documents\img_align_celeba"
 
 def load_image( infilename ) :
     img = PIL.Image.open( infilename )
