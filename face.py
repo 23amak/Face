@@ -27,7 +27,7 @@ def load_image( infilename ) :
     img = img.resize((64,64))
     data = np.asarray( img, dtype="int32" )
     return data
-load_image(path + "img_align_celeba").shape
+load_image(path).shape
 plt.imshow(load_image(path + "000451.jpg"))
 plt.imshow(load_image(path + "000451.jpg"))
 plt.imshow(load_image(path + "000451.jpg"))
