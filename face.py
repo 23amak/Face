@@ -21,17 +21,6 @@ tf.__version__
 
 path = "C:/Users/foggy/Documents/img_align_celeba"
 
-assert os.path.isfile(path)
-path = ["C:/Users/foggy/Documents/img_align_celeba"]
-f = 'C:'
-for p in path:
-  f = os.path.join(f, p)
-  print(f)
-  assert os.path.exists(f)
-assert os.path.isfile(f)
-#with open(path, "r") as f:
- # pass
-
 def load_image( infilename ) :
     img = PIL.Image.open( infilename )
     img = img.crop([25,65,153,193])
