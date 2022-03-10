@@ -22,6 +22,7 @@ tf.__version__
 path = "C:/Users/foggy/Documents/img_align_celeba"
 
 assert os.path.isfile(path)
+path = ["C:/Users/foggy/Documents/img_align_celeba"]
 f = 'C:'
 for p in path:
   f = os.path.join(f, p)
