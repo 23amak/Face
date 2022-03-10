@@ -27,10 +27,10 @@ def load_image( infilename ) :
     img = img.resize((64,64))
     data = np.asarray( img, dtype="int32" )
     return data
-load_image(path + "000001.jpg").shape
-plt.imshow(load_image(path + "000451.jpg"))
-plt.imshow(load_image(path + "000451.jpg"))
-plt.imshow(load_image(path + "000451.jpg"))
+load_image(path + "000001.png").shape
+plt.imshow(load_image(path + "000451.png"))
+plt.imshow(load_image(path + "000451.png"))
+plt.imshow(load_image(path + "000451.png"))
 
 train_images = np.array(os.listdir(path))
 np.random.shuffle(train_images)
