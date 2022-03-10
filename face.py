@@ -4,11 +4,12 @@ import matplotlib.pyplot as plt
 import PIL
 from tensorflow.keras import layers
 import os
+"""
 import tarfile
 my_tar = tarfile.open('lfw.tgz')
 my_tar.extractall('./lfw') # specify which folder to extract to
 my_tar.close()
-
+"""
 #%matplotlib inline
 
 def get_ds(path):
