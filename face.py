@@ -23,14 +23,14 @@ from zipfile import ZipFile
 We'll use face images from the CelebA dataset, resized to 64x64.
 """
 
-os.makedirs("celeba_gan")
+os.makedirs("C:/Users/foggy/Documents/img_align_celeba")
 
 url = "https://drive.google.com/uc?id=1O7m1010EJjLE5QxLZiM9Fpjs7Oj6e684"
-output = "celeba_gan/data.zip"
+output = "C:/Users/foggy/Documents/img_align_celeba/data.zip"
 gdown.download(url, output, quiet=True)
 
-with ZipFile("celeba_gan/data.zip", "r") as zipobj:
-    zipobj.extractall("celeba_gan")
+with ZipFile("C:/Users/foggy/Documents/img_align_celeba/data.zip", "r") as zipobj:
+    zipobj.extractall("C:/Users/foggy/Documents/img_align_celeba")
 
 """
 Create a dataset from our folder, and rescale the images to the [0-1] range:
