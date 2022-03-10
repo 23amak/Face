@@ -21,9 +21,15 @@ tf.__version__
 
 path = "C:/Users/foggy/Documents/img_align_celeba"
 
-assert os.path.isfile(r"C:/Users/foggy/Documents/img_align_celeba")
-with open(path, "r") as f:
-  pass
+assert os.path.isfile(path)
+f = 'C:'
+for p in path:
+  f = os.path.join(f, p)
+  print(f)
+  assert os.path.exists(f)
+assert os.path.isfile(f)
+#with open(path, "r") as f:
+ # pass
 
 def load_image( infilename ) :
     img = PIL.Image.open( infilename )
