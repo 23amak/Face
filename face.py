@@ -1,217 +1,321 @@
-"""
-Title: DCGAN to generate face images
-Author: [fchollet](https://twitter.com/fchollet)
-Date created: 2019/04/29
-Last modified: 2021/01/01
-Description: A simple DCGAN trained using `fit()` by overriding `train_step` on CelebA images.
-"""
-"""
-## Setup
-"""
-
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
-import numpy as np
-import matplotlib.pyplot as plt
 import os
-import gdown
-from zipfile import ZipFile
+import time
+import tensorflow as tf
+import numpy as np
+from glob import glob
+import datetime
+import random
+from PIL import Image
+import matplotlib.pyplot as plt
+%matplotlib inline
+def generator(z, output_channel_dim, training):
+    with tf.variable_scope("generator", reuse= not training):
+        
+        # 8x8x1024
+        fully_connected = tf.layers.dense(z, 8*8*1024)
+        fully_connected = tf.reshape(fully_connected, (-1, 8, 8, 1024))
+        fully_connected = tf.nn.leaky_relu(fully_connected)
 
-"""
-## Prepare CelebA data
-We'll use face images from the CelebA dataset, resized to 64x64.
-"""
+        # 8x8x1024 -> 16x16x512
+        trans_conv1 = tf.layers.conv2d_transpose(inputs=fully_connected,
+                                                 filters=512,
+                                                 kernel_size=[5,5],
+                                                 strides=[2,2],
+                                                 padding="SAME",
+                                                 kernel_initializer=tf.truncated_normal_initializer(stddev=WEIGHT_INIT_STDDEV),
+                                                 name="trans_conv1")
+        batch_trans_conv1 = tf.layers.batch_normalization(inputs = trans_conv1,
+                                                          training=training,
+                                                          epsilon=EPSILON,
+                                                          name="batch_trans_conv1")
+        trans_conv1_out = tf.nn.leaky_relu(batch_trans_conv1,
+                                           name="trans_conv1_out")
+        
+        # 16x16x512 -> 32x32x256
+        trans_conv2 = tf.layers.conv2d_transpose(inputs=trans_conv1_out,
+                                                 filters=256,
+                                                 kernel_size=[5,5],
+                                                 strides=[2,2],
+                                                 padding="SAME",
+                                                 kernel_initializer=tf.truncated_normal_initializer(stddev=WEIGHT_INIT_STDDEV),
+                                                 name="trans_conv2")
+        batch_trans_conv2 = tf.layers.batch_normalization(inputs = trans_conv2,
+                                                          training=training,
+                                                          epsilon=EPSILON,
+                                                          name="batch_trans_conv2")
+        trans_conv2_out = tf.nn.leaky_relu(batch_trans_conv2,
+                                           name="trans_conv2_out")
+        
+        # 32x32x256 -> 64x64x128
+        trans_conv3 = tf.layers.conv2d_transpose(inputs=trans_conv2_out,
+                                                 filters=128,
+                                                 kernel_size=[5,5],
+                                                 strides=[2,2],
+                                                 padding="SAME",
+                                                 kernel_initializer=tf.truncated_normal_initializer(stddev=WEIGHT_INIT_STDDEV),
+                                                 name="trans_conv3")
+        batch_trans_conv3 = tf.layers.batch_normalization(inputs = trans_conv3,
+                                                          training=training,
+                                                          epsilon=EPSILON,
+                                                          name="batch_trans_conv3")
+        trans_conv3_out = tf.nn.leaky_relu(batch_trans_conv3,
+                                           name="trans_conv3_out")
+        
+        # 64x64x128 -> 128x128x64
+        trans_conv4 = tf.layers.conv2d_transpose(inputs=trans_conv3_out,
+                                                 filters=64,
+                                                 kernel_size=[5,5],
+                                                 strides=[2,2],
+                                                 padding="SAME",
+                                                 kernel_initializer=tf.truncated_normal_initializer(stddev=WEIGHT_INIT_STDDEV),
+                                                 name="trans_conv4")
+        batch_trans_conv4 = tf.layers.batch_normalization(inputs = trans_conv4,
+                                                          training=training,
+                                                          epsilon=EPSILON,
+                                                          name="batch_trans_conv4")
+        trans_conv4_out = tf.nn.leaky_relu(batch_trans_conv4,
+                                           name="trans_conv4_out")
+        
+        # 128x128x64 -> 128x128x3
+        logits = tf.layers.conv2d_transpose(inputs=trans_conv4_out,
+                                            filters=3,
+                                            kernel_size=[5,5],
+                                            strides=[1,1],
+                                            padding="SAME",
+                                            kernel_initializer=tf.truncated_normal_initializer(stddev=WEIGHT_INIT_STDDEV),
+                                            name="logits")
+        out = tf.tanh(logits, name="out")
+        return out
+def discriminator(x, reuse):
+    with tf.variable_scope("discriminator", reuse=reuse): 
+        
+        # 128*128*3 -> 64x64x64 
+        conv1 = tf.layers.conv2d(inputs=x,
+                                 filters=64,
+                                 kernel_size=[5,5],
+                                 strides=[2,2],
+                                 padding="SAME",
+                                 kernel_initializer=tf.truncated_normal_initializer(stddev=WEIGHT_INIT_STDDEV),
+                                 name='conv1')
+        batch_norm1 = tf.layers.batch_normalization(conv1,
+                                                    training=True,
+                                                    epsilon=EPSILON,
+                                                    name='batch_norm1')
+        conv1_out = tf.nn.leaky_relu(batch_norm1,
+                                     name="conv1_out")
+        
+        # 64x64x64-> 32x32x128 
+        conv2 = tf.layers.conv2d(inputs=conv1_out,
+                                 filters=128,
+                                 kernel_size=[5, 5],
+                                 strides=[2, 2],
+                                 padding="SAME",
+                                 kernel_initializer=tf.truncated_normal_initializer(stddev=WEIGHT_INIT_STDDEV),
+                                 name='conv2')
+        batch_norm2 = tf.layers.batch_normalization(conv2,
+                                                    training=True,
+                                                    epsilon=EPSILON,
+                                                    name='batch_norm2')
+        conv2_out = tf.nn.leaky_relu(batch_norm2,
+                                     name="conv2_out")
+        
+        # 32x32x128 -> 16x16x256  
+        conv3 = tf.layers.conv2d(inputs=conv2_out,
+                                 filters=256,
+                                 kernel_size=[5, 5],
+                                 strides=[2, 2],
+                                 padding="SAME",
+                                 kernel_initializer=tf.truncated_normal_initializer(stddev=WEIGHT_INIT_STDDEV),
+                                 name='conv3')
+        batch_norm3 = tf.layers.batch_normalization(conv3,
+                                                    training=True,
+                                                    epsilon=EPSILON,
+                                                    name='batch_norm3')
+        conv3_out = tf.nn.leaky_relu(batch_norm3,
+                                     name="conv3_out")
+        
+        # 16x16x256 -> 16x16x512
+        conv4 = tf.layers.conv2d(inputs=conv3_out,
+                                 filters=512,
+                                 kernel_size=[5, 5],
+                                 strides=[1, 1],
+                                 padding="SAME",
+                                 kernel_initializer=tf.truncated_normal_initializer(stddev=WEIGHT_INIT_STDDEV),
+                                 name='conv4')
+        batch_norm4 = tf.layers.batch_normalization(conv4,
+                                                    training=True,
+                                                    epsilon=EPSILON,
+                                                    name='batch_norm4')
+        conv4_out = tf.nn.leaky_relu(batch_norm4,
+                                     name="conv4_out")
+        
+        # 16x16x512 -> 8x8x1024
+        conv5 = tf.layers.conv2d(inputs=conv4_out,
+                                filters=1024,
+                                kernel_size=[5, 5],
+                                strides=[2, 2],
+                                padding="SAME",
+                                kernel_initializer=tf.truncated_normal_initializer(stddev=WEIGHT_INIT_STDDEV),
+                                name='conv5')
+        batch_norm5 = tf.layers.batch_normalization(conv5,
+                                                    training=True,
+                                                    epsilon=EPSILON,
+                                                    name='batch_norm5')
+        conv5_out = tf.nn.leaky_relu(batch_norm5,
+                                     name="conv5_out")
 
-os.makedirs("C:/Users/foggy/Documents/img_align_celeba")
+        flatten = tf.reshape(conv5_out, (-1, 8*8*1024))
+        logits = tf.layers.dense(inputs=flatten,
+                                 units=1,
+                                 activation=None)
+        out = tf.sigmoid(logits)
+        return out, logits
+def model_loss(input_real, input_z, output_channel_dim):
+    g_model = generator(input_z, output_channel_dim, True)
 
-url = "https://drive.google.com/uc?id=1O7m1010EJjLE5QxLZiM9Fpjs7Oj6e684"
-output = "C:/Users/foggy/Documents/img_align_celeba/data.zip"
-gdown.download(url, output, quiet=True)
+    noisy_input_real = input_real + tf.random_normal(shape=tf.shape(input_real),
+                                                     mean=0.0,
+                                                     stddev=random.uniform(0.0, 0.1),
+                                                     dtype=tf.float32)
+    
+    d_model_real, d_logits_real = discriminator(noisy_input_real, reuse=False)
+    d_model_fake, d_logits_fake = discriminator(g_model, reuse=True)
+    
+    d_loss_real = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=d_logits_real,
+                                                                         labels=tf.ones_like(d_model_real)*random.uniform(0.9, 1.0)))
+    d_loss_fake = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=d_logits_fake,
+                                                                         labels=tf.zeros_like(d_model_fake)))
+    d_loss = tf.reduce_mean(0.5 * (d_loss_real + d_loss_fake))
+    g_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=d_logits_fake,
+                                                                    labels=tf.ones_like(d_model_fake)))
+    return d_loss, g_loss
+def model_optimizers(d_loss, g_loss):
+    t_vars = tf.trainable_variables()
+    g_vars = [var for var in t_vars if var.name.startswith("generator")]
+    d_vars = [var for var in t_vars if var.name.startswith("discriminator")]
+    
+    update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+    gen_updates = [op for op in update_ops if op.name.startswith('generator') or op.name.startswith('discriminator')]
+    
+    with tf.control_dependencies(gen_updates):
+        d_train_opt = tf.train.AdamOptimizer(learning_rate=LR_D, beta1=BETA1).minimize(d_loss, var_list=d_vars)
+        g_train_opt = tf.train.AdamOptimizer(learning_rate=LR_G, beta1=BETA1).minimize(g_loss, var_list=g_vars)  
+    return d_train_opt, g_train_opt
+def model_inputs(real_dim, z_dim):
+    inputs_real = tf.placeholder(tf.float32, (None, *real_dim), name='inputs_real')
+    inputs_z = tf.placeholder(tf.float32, (None, z_dim), name="input_z")
+    learning_rate_G = tf.placeholder(tf.float32, name="lr_g")
+    learning_rate_D = tf.placeholder(tf.float32, name="lr_d")
+    return inputs_real, inputs_z, learning_rate_G, learning_rate_D
+def show_samples(sample_images, name, epoch):
+    figure, axes = plt.subplots(1, len(sample_images), figsize = (IMAGE_SIZE, IMAGE_SIZE))
+    for index, axis in enumerate(axes):
+        axis.axis('off')
+        image_array = sample_images[index]
+        axis.imshow(image_array)
+        image = Image.fromarray(image_array)
+        image.save(name+"_"+str(epoch)+"_"+str(index)+".png") 
+    plt.savefig(name+"_"+str(epoch)+".png", bbox_inches='tight', pad_inches=0)
+    plt.show()
+    plt.close()
+def test(sess, input_z, out_channel_dim, epoch):
+    example_z = np.random.uniform(-1, 1, size=[SAMPLES_TO_SHOW, input_z.get_shape().as_list()[-1]])
+    samples = sess.run(generator(input_z, out_channel_dim, False), feed_dict={input_z: example_z})
+    sample_images = [((sample + 1.0) * 127.5).astype(np.uint8) for sample in samples]
+    show_samples(sample_images, OUTPUT_DIR + "samples", epoch)
+def summarize_epoch(epoch, sess, d_losses, g_losses, input_z, data_shape, saver):
+    print("\nEpoch {}/{}".format(epoch, EPOCHS),
+          "\nD Loss: {:.5f}".format(np.mean(d_losses[-MINIBATCH_SIZE:])),
+          "\nG Loss: {:.5f}".format(np.mean(g_losses[-MINIBATCH_SIZE:])))
+    fig, ax = plt.subplots()
+    plt.plot(d_losses, label='Discriminator', alpha=0.6)
+    plt.plot(g_losses, label='Generator', alpha=0.6)
+    plt.title("Losses")
+    plt.legend()
+    plt.savefig(OUTPUT_DIR + "losses_" + str(epoch) + ".png")
+    plt.show()
+    plt.close()
+    saver.save(sess, OUTPUT_DIR + "model_" + str(epoch) + ".ckpt")
+    test(sess, input_z, data_shape[3], epoch)
+def get_batch(dataset):
+    files = random.sample(dataset, BATCH_SIZE)
+    batch = []
+    for file in files:
+        if random.choice([True, False]):
+            batch.append(np.asarray(Image.open(file).transpose(Image.FLIP_LEFT_RIGHT)))
+        else:
+            batch.append(np.asarray(Image.open(file)))                     
+    batch = np.asarray(batch)
+    normalized_batch = (batch / 127.5) - 1.0
+    return normalized_batch, files
+def train(data_shape, epoch, checkpoint_path):
+    input_images, input_z, lr_G, lr_D = model_inputs(data_shape[1:], NOISE_SIZE)
+    d_loss, g_loss = model_loss(input_images, input_z, data_shape[3])
+    d_opt, g_opt = model_optimizers(d_loss, g_loss)
+    
+    with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
+        saver = tf.train.Saver()
+        if checkpoint_path is not None:
+            saver.restore(sess, checkpoint_path)
+            
+        iteration = 0
+        d_losses = []
+        g_losses = []
+        
+        for epoch in range(EPOCH, EPOCHS):        
+            epoch += 1
+            epoch_dataset = DATASET.copy()
+            
+            for i in range(MINIBATCH_SIZE):
+                iteration_start_time = time.time()
+                iteration += 1
+                batch_images, used_files = get_batch(epoch_dataset)
+                [epoch_dataset.remove(file) for file in used_files]
+                
+                batch_z = np.random.uniform(-1, 1, size=(BATCH_SIZE, NOISE_SIZE))
+                _ = sess.run(d_opt, feed_dict={input_images: batch_images, input_z: batch_z, lr_D: LR_D})
+                _ = sess.run(g_opt, feed_dict={input_images: batch_images, input_z: batch_z, lr_G: LR_G})
+                d_losses.append(d_loss.eval({input_z: batch_z, input_images: batch_images}))
+                g_losses.append(g_loss.eval({input_z: batch_z}))
+                
+                elapsed_time = round(time.time()-iteration_start_time, 3)
+                remaining_files = len(epoch_dataset)
+                print("\rEpoch: " + str(epoch) +
+                      ", iteration: " + str(iteration) + 
+                      ", d_loss: " + str(round(d_losses[-1], 3)) +
+                      ", g_loss: " + str(round(g_losses[-1], 3)) +
+                      ", duration: " + str(elapsed_time) + 
+                      ", minutes remaining: " + str(round(remaining_files/BATCH_SIZE*elapsed_time/60, 1)) +
+                      ", remaining files in batch: " + str(remaining_files)
+                      , sep=' ', end=' ', flush=True)
+                
+            summarize_epoch(epoch, sess, d_losses, g_losses, input_z, data_shape, saver)
+# Hyperparameters
+IMAGE_SIZE = 128
+NOISE_SIZE = 100
+LR_D = 0.00004
+LR_G = 0.0002
+BATCH_SIZE = 64
+EPOCH = 0 # Non-zero only if we are resuming training with model checkpoint
+EPOCHS = 5 #EPOCH + number of epochs to perform
+BETA1 = 0.5
+WEIGHT_INIT_STDDEV = 0.02
+EPSILON = 0.00005
+SAMPLES_TO_SHOW = 5
+# Data (https://www.kaggle.com/greg115/celebrities-100k)
+BASE_PATH = "../input/"
+DATASET_LIST_PATH = BASE_PATH + "100k.txt"
+INPUT_DATA_DIR = BASE_PATH + "100k/100k/"
+OUTPUT_DIR = "./"
+DATASET = [INPUT_DATA_DIR + str(line).rstrip() for line in open(DATASET_LIST_PATH,"r")]
+DATASET_SIZE = len(DATASET) 
+MINIBATCH_SIZE = DATASET_SIZE // BATCH_SIZE
 
-with ZipFile("C:/Users/foggy/Documents/img_align_celeba/data.zip", "r") as zipobj:
-    zipobj.extractall("C:/Users/foggy/Documents/img_align_celeba")
-
-"""
-Create a dataset from our folder, and rescale the images to the [0-1] range:
-"""
-
-dataset = keras.preprocessing.image_dataset_from_directory(
-    "C:/Users/foggy/Documents/img_align_celeba", label_mode=None, image_size=(64, 64), batch_size=32
-)
-dataset = dataset.map(lambda x: x / 255.0)
-
-
-"""
-Let's display a sample image:
-"""
-
-
-for x in dataset:
-    plt.axis("off")
-    plt.imshow((x.numpy() * 255).astype("int32")[0])
-    break
-
-
-"""
-## Create the discriminator
-It maps a 64x64 image to a binary classification score.
-"""
-
-discriminator = keras.Sequential(
-    [
-        keras.Input(shape=(64, 64, 3)),
-        layers.Conv2D(64, kernel_size=4, strides=2, padding="same"),
-        layers.LeakyReLU(alpha=0.2),
-        layers.Conv2D(128, kernel_size=4, strides=2, padding="same"),
-        layers.LeakyReLU(alpha=0.2),
-        layers.Conv2D(128, kernel_size=4, strides=2, padding="same"),
-        layers.LeakyReLU(alpha=0.2),
-        layers.Flatten(),
-        layers.Dropout(0.2),
-        layers.Dense(1, activation="sigmoid"),
-    ],
-    name="discriminator",
-)
-discriminator.summary()
-
-"""
-## Create the generator
-It mirrors the discriminator, replacing `Conv2D` layers with `Conv2DTranspose` layers.
-"""
-
-latent_dim = 128
-
-generator = keras.Sequential(
-    [
-        keras.Input(shape=(latent_dim,)),
-        layers.Dense(8 * 8 * 128),
-        layers.Reshape((8, 8, 128)),
-        layers.Conv2DTranspose(128, kernel_size=4, strides=2, padding="same"),
-        layers.LeakyReLU(alpha=0.2),
-        layers.Conv2DTranspose(256, kernel_size=4, strides=2, padding="same"),
-        layers.LeakyReLU(alpha=0.2),
-        layers.Conv2DTranspose(512, kernel_size=4, strides=2, padding="same"),
-        layers.LeakyReLU(alpha=0.2),
-        layers.Conv2D(3, kernel_size=5, padding="same", activation="sigmoid"),
-    ],
-    name="generator",
-)
-generator.summary()
-
-"""
-## Override `train_step`
-"""
-
-
-class GAN(keras.Model):
-    def __init__(self, discriminator, generator, latent_dim):
-        super(GAN, self).__init__()
-        self.discriminator = discriminator
-        self.generator = generator
-        self.latent_dim = latent_dim
-
-    def compile(self, d_optimizer, g_optimizer, loss_fn):
-        super(GAN, self).compile()
-        self.d_optimizer = d_optimizer
-        self.g_optimizer = g_optimizer
-        self.loss_fn = loss_fn
-        self.d_loss_metric = keras.metrics.Mean(name="d_loss")
-        self.g_loss_metric = keras.metrics.Mean(name="g_loss")
-
-    @property
-    def metrics(self):
-        return [self.d_loss_metric, self.g_loss_metric]
-
-    def train_step(self, real_images):
-        # Sample random points in the latent space
-        batch_size = tf.shape(real_images)[0]
-        random_latent_vectors = tf.random.normal(shape=(batch_size, self.latent_dim))
-
-        # Decode them to fake images
-        generated_images = self.generator(random_latent_vectors)
-
-        # Combine them with real images
-        combined_images = tf.concat([generated_images, real_images], axis=0)
-
-        # Assemble labels discriminating real from fake images
-        labels = tf.concat(
-            [tf.ones((batch_size, 1)), tf.zeros((batch_size, 1))], axis=0
-        )
-        # Add random noise to the labels - important trick!
-        labels += 0.05 * tf.random.uniform(tf.shape(labels))
-
-        # Train the discriminator
-        with tf.GradientTape() as tape:
-            predictions = self.discriminator(combined_images)
-            d_loss = self.loss_fn(labels, predictions)
-        grads = tape.gradient(d_loss, self.discriminator.trainable_weights)
-        self.d_optimizer.apply_gradients(
-            zip(grads, self.discriminator.trainable_weights)
-        )
-
-        # Sample random points in the latent space
-        random_latent_vectors = tf.random.normal(shape=(batch_size, self.latent_dim))
-
-        # Assemble labels that say "all real images"
-        misleading_labels = tf.zeros((batch_size, 1))
-
-        # Train the generator (note that we should *not* update the weights
-        # of the discriminator)!
-        with tf.GradientTape() as tape:
-            predictions = self.discriminator(self.generator(random_latent_vectors))
-            g_loss = self.loss_fn(misleading_labels, predictions)
-        grads = tape.gradient(g_loss, self.generator.trainable_weights)
-        self.g_optimizer.apply_gradients(zip(grads, self.generator.trainable_weights))
-
-        # Update metrics
-        self.d_loss_metric.update_state(d_loss)
-        self.g_loss_metric.update_state(g_loss)
-        return {
-            "d_loss": self.d_loss_metric.result(),
-            "g_loss": self.g_loss_metric.result(),
-        }
-
-
-"""
-## Create a callback that periodically saves generated images
-"""
-
-
-class GANMonitor(keras.callbacks.Callback):
-    def __init__(self, num_img=3, latent_dim=128):
-        self.num_img = num_img
-        self.latent_dim = latent_dim
-
-    def on_epoch_end(self, epoch, logs=None):
-        random_latent_vectors = tf.random.normal(shape=(self.num_img, self.latent_dim))
-        generated_images = self.model.generator(random_latent_vectors)
-        generated_images *= 255
-        generated_images.numpy()
-        for i in range(self.num_img):
-            img = keras.preprocessing.image.array_to_img(generated_images[i])
-            img.save("generated_img_%03d_%d.png" % (epoch, i))
-
-
-"""
-## Train the end-to-end model
-"""
-
-epochs = 1  # In practice, use ~100 epochs
-
-gan = GAN(discriminator=discriminator, generator=generator, latent_dim=latent_dim)
-gan.compile(
-    d_optimizer=keras.optimizers.Adam(learning_rate=0.0001),
-    g_optimizer=keras.optimizers.Adam(learning_rate=0.0001),
-    loss_fn=keras.losses.BinaryCrossentropy(),
-)
-
-gan.fit(
-    dataset, epochs=epochs, callbacks=[GANMonitor(num_img=10, latent_dim=latent_dim)]
-)
-
-"""
-Some of the last generated images around epoch 30
-(results keep improving after that):
-![results](https://i.imgur.com/h5MtQZ7l.png)
-"""
+# Optional - model path to resume training
+#MODEL_PATH = BASE_PATH + "models/" + "model_" + str(EPOCH) + ".ckpt"
+# Training
+with tf.Graph().as_default():
+    train(data_shape=(DATASET_SIZE, IMAGE_SIZE, IMAGE_SIZE, 3),
+          epoch=EPOCH,
+          checkpoint_path=None)
