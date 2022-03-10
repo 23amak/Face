@@ -7,7 +7,7 @@ import datetime
 import random
 from PIL import Image
 import matplotlib.pyplot as plt
-%matplotlib inline
+#%matplotlib inline
 def generator(z, output_channel_dim, training):
     with tf.variable_scope("generator", reuse= not training):
         
