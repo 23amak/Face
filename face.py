@@ -307,8 +307,8 @@ SAMPLES_TO_SHOW = 5
 BASE_PATH = "../input/"
 DATASET_LIST_PATH = BASE_PATH + "100k.txt"
 INPUT_DATA_DIR = BASE_PATH + "100k/100k/"
-OUTPUT_DIR = "./"
-DATASET = [INPUT_DATA_DIR + str(line).rstrip() for line in open(DATASET_LIST_PATH,"r")]
+OUTPUT_DIR = "C:/Users/foggy/Documents/Face"
+DATASET = [INPUT_DATA_DIR + str(line).rstrip() for line in open(DATASET_LIST_PATH,"C:/Users/foggy/Documents/img_align_celeba")]
 DATASET_SIZE = len(DATASET) 
 MINIBATCH_SIZE = DATASET_SIZE // BATCH_SIZE
 
