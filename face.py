@@ -106,6 +106,13 @@ def make_generator_model():
   
   return model
 
+generator = make_generator_model()
+
+noise = tf.random.normal([1,100]) # shape is 1, 100
+generated_image = generator(noise, training = False)
+plt.imshow(generated_image[0], interpolation="nearest")
+
+
 def make_discriminator_model():
     model = tf.keras.Sequential()
     model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same', 
