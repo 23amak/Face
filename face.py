@@ -19,7 +19,10 @@ import PIL
 
 tf.__version__
 
-path = "C:/Users/foggy/Documents/img_align_celeba"
+path = "../img_align_celeba/"
+
+
+#path = path.map(lambda epoch: epoch / 255.0)
 
 def load_image( infilename ) :
     img = PIL.Image.open( infilename )
@@ -27,7 +30,7 @@ def load_image( infilename ) :
     img = img.resize((64,64))
     data = np.asarray( img, dtype="int32" )
     return data
-load_image(path).shape
+#load_image(path).shape
 plt.imshow(load_image(path + "000451.jpg"))
 plt.imshow(load_image(path + "000451.jpg"))
 plt.imshow(load_image(path + "000451.jpg"))
@@ -219,7 +222,7 @@ they are executed within this context manager and at least one of their inputs i
     images = None
 
     #@tf.function
-def train(dataset, epochs):  
+def train(dataset, epochs): 
   tf.print("Starting man!")
   for epoch in range(epochs):
     start = time.time()
