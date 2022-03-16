@@ -190,7 +190,7 @@ seed = tf.random.normal([num_examples_to_generate, noise_dim], seed=1)
 
 seed
 
-EPOCHS = 150000
+EPOCHS = 200
 
 """
 The training loop begins with generator receiving a random seed as input. 
