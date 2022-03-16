@@ -37,8 +37,8 @@ plt.imshow(load_image(path + "000451.jpg"))
 
 train_images = np.array(os.listdir(path))
 np.random.shuffle(train_images)
-BUFFER_SIZE = 200000 #100 # number of images in training i think
-BATCH_SIZE = 5#500 # This is just the standard number for batch size. Google for more info
+BUFFER_SIZE = 100 #200000 number of images in training i think
+BATCH_SIZE = 5 #500 # This is just the standard number for batch size. Google for more info
 # shuffle and batch the data
 np.random.shuffle(train_images)
 train_images = np.split(train_images[:BUFFER_SIZE],BATCH_SIZE) 
@@ -190,7 +190,7 @@ seed = tf.random.normal([num_examples_to_generate, noise_dim], seed=1)
 
 seed
 
-EPOCHS = 100
+EPOCHS = 1000
 
 """
 The training loop begins with generator receiving a random seed as input. 
