@@ -174,6 +174,14 @@ A learning rate is maintained for each network weight (parameter) and separately
 generator_optimizer = tf.keras.optimizers.Adam(1e-4)
 discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 
+checkpoint_dir = "./training_checkpoints"
+checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
+checkpoint = tf.train.Checkpoint(generator_optimizer = generator_optimizer,
+                                 discriminator_optimizer = discriminator_optimizer,
+                                 generator = generator,
+                                 discriminator = discriminator)
+checkpoint_prefix
+
 # We will reuse this seed overtime (so it's easier) to visualize progress in the animated GIF
 tf.random.set_seed(1234)
 noise_dim = 100
@@ -261,6 +269,7 @@ def train(dataset, epochs):
   generate_and_save_images(generator,
                            epochs,
                            seed)
+
 def generate_and_save_images(model, epoch, test_input):
   # Notice `training` is set to False. 
   # This is so all layers run in inference mode (batchnorm).
