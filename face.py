@@ -251,10 +251,10 @@ def train(dataset, epochs):
     
 
     # Produce images for the GIF as we go
-    display.clear_output(wait=True)
+    """display.clear_output(wait=True)
     generate_and_save_images(generator,
                              epoch + 1,
-                             seed)
+                             seed)"""
     
     tf.print("Epoch:", epoch, "finished")
     tf.print()
@@ -265,10 +265,10 @@ def train(dataset, epochs):
     tf.print ('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
     
   # Generate after the final epoch
-  display.clear_output(wait=True)
+  """display.clear_output(wait=True)
   generate_and_save_images(generator,
                            epochs,
-                           seed)
+                           seed)"""
 
 def generate_and_save_images(model, epoch, test_input):
   # Notice `training` is set to False. 
@@ -285,8 +285,8 @@ def generate_and_save_images(model, epoch, test_input):
   plt.savefig('image_at_epoch_{:04d}.png'.format(epoch))
   plt.show()
 from IPython.display import Image
-#Image(filename='image_at_epoch_0060.png') 
-#display.Image(filename="dcgan_celebA.gif.png")
+"""Image(filename='image_at_epoch_0060.png') 
+display.Image(filename="dcgan_celebA.gif.png")"""
 
 train(train_images, EPOCHS)
 
