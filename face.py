@@ -286,7 +286,7 @@ def generate_and_save_images(model, epoch, test_input):
   plt.show()
 from IPython.display import Image
 #Image(filename='image_at_epoch_0060.png') 
-display.Image(filename="dcgan_celebA.gif.png")
+#display.Image(filename="dcgan_celebA.gif.png")
 
 train(train_images, EPOCHS)
 
@@ -320,7 +320,7 @@ with imageio.get_writer('dcgan.gif', mode='I') as writer:
   writer.append_data(image)
     
 # A hack to display the GIF inside this notebook
-os.rename('dcgan.gif', 'dcgan_celebA.gif.png')
+#os.rename('dcgan.gif', 'dcgan_celebA.gif.png')
 
-display.Image(filename="dcgan_celebA.gif.png")
+#display.Image(filename="dcgan_celebA.gif.png")
 
