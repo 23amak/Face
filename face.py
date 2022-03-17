@@ -182,17 +182,16 @@ checkpoint = tf.train.Checkpoint(generator_optimizer = generator_optimizer,
                                  discriminator = discriminator)
 checkpoint_prefix
 
-
-from tensorflow.python.util.tf_export import estimator_export
-from tensorflow_estimator.python.estimator import gc
-from tensorflow_estimator.python.estimator import util
-from tensorflow_estimator.python.estimator.canned import metric_keys
-
-tf.estimator.BestExporter(
-    name='best_exporter', serving_input_receiver_fn = None,
-    event_file_pattern='eval/*.tfevents.*', compare_fn =_loss_smaller,
-    assets_extra = None, as_text = False, exports_to_keep = 5
-)
+# best model check point 
+checkpoint_path_best = f"best.hdf5"
+modelcheckpoint_best = ModelCheckpoint(checkpoint_path_best, 
+                                  monitor='val_loss', 
+                                  save_best_only=True, 
+                                  mode='min')
+# last model check point 
+checkpoint_path_last = f"last.hdf5"
+modelcheckpoint_last = ModelCheckpoint(checkpoint_path_last,                                  
+                                  save_best_only=False)
 
 # We will reuse this seed overtime (so it's easier) to visualize progress in the animated GIF
 tf.random.set_seed(1234)
@@ -272,7 +271,7 @@ def train(dataset, epochs):
     tf.print()
     
     # Save the model every epochs
-    checkpoint.save(file_prefix = checkpoint_prefix)
+    #checkpoint.save(file_prefix = checkpoint_prefix)
     
     tf.print ('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
     
