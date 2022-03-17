@@ -182,6 +182,18 @@ checkpoint = tf.train.Checkpoint(generator_optimizer = generator_optimizer,
                                  discriminator = discriminator)
 checkpoint_prefix
 
+
+from tensorflow.python.util.tf_export import estimator_export
+from tensorflow_estimator.python.estimator import gc
+from tensorflow_estimator.python.estimator import util
+from tensorflow_estimator.python.estimator.canned import metric_keys
+
+tf.estimator.BestExporter(
+    name='best_exporter', serving_input_receiver_fn = None,
+    event_file_pattern='eval/*.tfevents.*', compare_fn =_loss_smaller,
+    assets_extra = None, as_text = False, exports_to_keep = 5
+)
+
 # We will reuse this seed overtime (so it's easier) to visualize progress in the animated GIF
 tf.random.set_seed(1234)
 noise_dim = 100
