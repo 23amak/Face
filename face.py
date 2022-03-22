@@ -74,7 +74,7 @@ def make_generator_model():
   model.add(layers.LeakyReLU())
   
   # reshape the output from something flattened to something with a shape of (7,7,256)
-  model.add(layers.Reshape(( 4, 4, 1024)))
+  model.add(layers.Reshape(( 7, 7, 256)))
   assert model.output_shape == (None, 4, 4, 1024) # Note: None is the batch size
   
   """
@@ -197,7 +197,7 @@ modelcheckpoint_last = ModelCheckpoint(checkpoint_path_last,
 
 # We will reuse this seed overtime (so it's easier) to visualize progress in the animated GIF
 tf.random.set_seed(1234)
-noise_dim = 100
+noise_dim = 256
 num_examples_to_generate = 16
 seed = tf.random.normal([num_examples_to_generate, noise_dim], seed=1)
 
