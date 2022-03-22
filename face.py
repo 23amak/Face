@@ -74,8 +74,8 @@ def make_generator_model():
   model.add(layers.LeakyReLU())
   
   # reshape the output from something flattened to something with a shape of (7,7,256)
-  model.add(layers.Reshape(( 7, 7, 256)))
-  assert model.output_shape == (None, 7, 7, 256) # Note: None is the batch size
+  model.add(layers.Reshape(( 4, 4, 1024)))
+  assert model.output_shape == (None, 4, 4, 1024) # Note: None is the batch size
   
   """
   The generator uses a transposed convolutional layer (Upsampling) layers to produce an image from seed (random noise).
