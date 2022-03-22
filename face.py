@@ -15,6 +15,8 @@ import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import os
 import PIL
 
+from keras.callbacks import ModelCheckpoint
+
 "GPU" + device_lib.list_local_devices()[-1].physical_device_desc.split(",")[1]
 
 tf.__version__
