@@ -110,7 +110,7 @@ def make_generator_model():
 
 generator = make_generator_model()
 
-noise = tf.random.normal([1,100]) # shape is 1, 100
+noise = tf.random.normal([1,256]) # shape is 1, 100
 generated_image = generator(noise, training = False)
 plt.imshow(generated_image[0], interpolation="nearest")
 
