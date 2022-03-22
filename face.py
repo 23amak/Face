@@ -197,7 +197,7 @@ modelcheckpoint_last = ModelCheckpoint(checkpoint_path_last,
 
 # We will reuse this seed overtime (so it's easier) to visualize progress in the animated GIF
 tf.random.set_seed(1234)
-noise_dim = 100
+noise_dim = 256
 num_examples_to_generate = 16
 seed = tf.random.normal([num_examples_to_generate, noise_dim], seed=1)
 
@@ -311,7 +311,7 @@ for i in range(seed.shape[0]):
     plt.axis('off')
     
 plt.show()
-noise = tf.random.normal([1,100]) # shape is 1, 100
+noise = tf.random.normal([1,256]) # shape is 1, 100
 random_face = checkpoint.generator(noise, training = False).numpy()[0]
 plt.imshow(random_face, interpolation='nearest')
 plt.axis("off")
