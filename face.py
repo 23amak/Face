@@ -185,7 +185,7 @@ checkpoint = tf.train.Checkpoint(generator_optimizer = generator_optimizer,
 checkpoint_prefix
 
 # best model check point 
-checkpoint_path_best = f"C:\Users\foggy\Documents\Face\BestModelCKPT"
+checkpoint_path_best = f"C:/Users/foggy/Documents/Face/BestModelCKPT/"
 modelcheckpoint_best = ModelCheckpoint(checkpoint_path_best, 
                                   monitor='val_loss', 
                                   save_best_only=True, 
