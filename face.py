@@ -29,7 +29,7 @@ path = "../img_align_celeba/"
 def load_image( infilename ) :
     img = PIL.Image.open( infilename )
     img = img.crop([25,65,153,193])
-    img = img.resize((256,256))
+    img = img.resize((64,64))
     data = np.asarray( img, dtype="int32" )
     return data
 #load_image(path).shape
