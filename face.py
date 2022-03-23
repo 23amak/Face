@@ -185,11 +185,11 @@ checkpoint = tf.train.Checkpoint(generator_optimizer = generator_optimizer,
 checkpoint_prefix
 
 # best model check point 
-checkpoint_path_best = f"../BestModelCKPT/"
+checkpoint_path_best = f"best.hdf5"
 modelcheckpoint_best = ModelCheckpoint(checkpoint_path_best, 
                                   monitor='val_loss', 
                                   save_best_only=True, 
-                                  mode='min')
+                                  mode='max')
 # last model check point 
 checkpoint_path_last = f"last.hdf5"
 modelcheckpoint_last = ModelCheckpoint(checkpoint_path_last,                                  
