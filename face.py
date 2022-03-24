@@ -183,13 +183,12 @@ checkpoint = tf.train.Checkpoint(generator_optimizer = generator_optimizer,
                                  discriminator = discriminator)
 checkpoint_prefix
 
-checkpoint_filepath = '/BestModelCKPT'
-model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-    filepath=checkpoint_filepath,
-    save_weights_only=True,
-    monitor='val_accuracy',
-    mode='min',
-    save_best_only=True)
+filepath = '/BestModelCKPT'
+tf.keras.callbacks.ModelCheckpoint(
+    filepath, monitor='val_loss', verbose=0, save_best_only=True,
+    save_weights_only=False, mode='min', save_freq='epoch',
+    options=None, initial_value_threshold=None, **kwargs
+)
 
 """BestModelCKPT = './BestModelCKPT/'
 # best model check point 
@@ -202,6 +201,14 @@ modelcheckpoint_best = ModelCheckpoint(filepath = BestModelCKPT,
 checkpoint_path_last = f"last.hdf5"
 modelcheckpoint_last = ModelCheckpoint(checkpoint_path_last,                                  
                                   save_best_only=False)"""
+
+"""checkpoint_filepath = '/tmp/BestModelCKPT'
+model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+    filepath=checkpoint_filepath,
+    save_weights_only=True,
+    monitor='val_accuracy',
+    mode='min',
+    save_best_only=True)"""
 
 # We will reuse this seed overtime (so it's easier) to visualize progress in the animated GIF
 tf.random.set_seed(1234)
