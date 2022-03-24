@@ -183,8 +183,7 @@ checkpoint = tf.train.Checkpoint(generator_optimizer = generator_optimizer,
                                  discriminator = discriminator)
 checkpoint_prefix
 
-BestModelCKPT = "./BestModelCKPT/"
-checkpoint_prefix = os.path.join(BestModelCKPT, "ckpt")
+BestModelCKPT = './BestModelCKPT/'
 
 # best model check point 
 checkpoint_path_best = f"best.hdf5"
