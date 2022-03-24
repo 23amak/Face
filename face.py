@@ -195,8 +195,6 @@ checkpoint_path_last = f"last.hdf5"
 modelcheckpoint_last = ModelCheckpoint(checkpoint_path_last,                                  
                                   save_best_only=False)
 
-checkpoint.save(modelcheckpoint_best = checkpoint_prefix)
-
 # We will reuse this seed overtime (so it's easier) to visualize progress in the animated GIF
 tf.random.set_seed(1234)
 noise_dim = 100
