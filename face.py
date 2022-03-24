@@ -23,7 +23,6 @@ tf.__version__
 
 path = "../img_align_celeba/"
 
-
 #path = path.map(lambda epoch: epoch / 255.0)
 
 def load_image( infilename ) :
@@ -184,7 +183,8 @@ checkpoint = tf.train.Checkpoint(generator_optimizer = generator_optimizer,
                                  discriminator = discriminator)
 checkpoint_prefix
 
-BestModelCKPT = "../BestModelCKPT"
+BestModelCKPT = "./BestModelCKPT/"
+checkpoint_prefix = os.path.join(BestModelCKPT, "ckpt")
 
 # best model check point 
 checkpoint_path_best = f"best.hdf5"
