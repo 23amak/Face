@@ -187,7 +187,7 @@ filepath = '/BestModelCKPT'
 tf.keras.callbacks.ModelCheckpoint(
     filepath, monitor='val_loss', verbose=0, save_best_only=True,
     save_weights_only=False, mode='min', save_freq='epoch',
-    options=None, initial_value_threshold=None, **kwargs
+    options=None, initial_value_threshold=None,
 )
 
 """BestModelCKPT = './BestModelCKPT/'
