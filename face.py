@@ -175,13 +175,13 @@ A learning rate is maintained for each network weight (parameter) and separately
 generator_optimizer = tf.keras.optimizers.Adam(1e-4)
 discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 
-"""checkpoint_dir = "./training_checkpoints"
+checkpoint_dir = "./training_checkpoints"
 checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
 checkpoint = tf.train.Checkpoint(generator_optimizer = generator_optimizer,
                                  discriminator_optimizer = discriminator_optimizer,
                                  generator = generator,
                                  discriminator = discriminator)
-checkpoint_prefix"""
+checkpoint_prefix
 
 BestModelCKPT = './training_checkpoints/'
 # best model check point 
