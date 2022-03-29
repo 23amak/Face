@@ -175,22 +175,15 @@ A learning rate is maintained for each network weight (parameter) and separately
 generator_optimizer = tf.keras.optimizers.Adam(1e-4)
 discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 
-checkpoint_dir = "./training_checkpoints"
+"""checkpoint_dir = "./training_checkpoints"
 checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
 checkpoint = tf.train.Checkpoint(generator_optimizer = generator_optimizer,
                                  discriminator_optimizer = discriminator_optimizer,
                                  generator = generator,
                                  discriminator = discriminator)
-checkpoint_prefix
+checkpoint_prefix"""
 
-filepath = '/BestModelCKPT'
-tf.keras.callbacks.ModelCheckpoint(
-    filepath, monitor='val_loss', verbose=0, save_best_only=True,
-    save_weights_only=False, mode='min', save_freq='epoch',
-    options=None, initial_value_threshold=None,
-)
-
-"""BestModelCKPT = './BestModelCKPT/'
+BestModelCKPT = './training_checkpoints/'
 # best model check point 
 checkpoint_path_best = f"best.hdf5"
 modelcheckpoint_best = ModelCheckpoint(filepath = BestModelCKPT, 
@@ -200,7 +193,7 @@ modelcheckpoint_best = ModelCheckpoint(filepath = BestModelCKPT,
 # last model check point 
 checkpoint_path_last = f"last.hdf5"
 modelcheckpoint_last = ModelCheckpoint(checkpoint_path_last,                                  
-                                  save_best_only=False)"""
+                                  save_best_only=False)
 
 """checkpoint_filepath = '/tmp/BestModelCKPT'
 model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
@@ -279,21 +272,28 @@ def train(dataset, epochs):
     
 
     # Produce images for the GIF as we go
-    """display.clear_output(wait=True)
+    display.clear_output(wait=True)
     generate_and_save_images(generator,
                              epoch + 1,
-                             seed)"""
+                             seed)
     
     tf.print("Epoch:", epoch, "finished")
     tf.print()
+
+"""file_checkpoint = '/BestModelCKPT'
+tf.keras.callbacks.ModelCheckpoint(
+    filepath = file_checkpoint, monitor='val_loss', verbose=0, save_best_only=True,
+    save_weights_only=False, mode='min', save_freq='epoch',
+    options=None, initial_value_threshold=None,"""
+#)
     
     # Save the model every epochs
-    #checkpoint.save(file_prefix = checkpoint_prefix)
+checkpoint.save(file_prefix = checkpoint_prefix)
     
-    tf.print ('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
+tf.print ('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
     
   # Generate after the final epoch
-  """display.clear_output(wait=True)
+"""display.clear_output(wait=True)
   generate_and_save_images(generator,
                            epochs,
                            seed)"""
@@ -310,8 +310,8 @@ def generate_and_save_images(model, epoch, test_input):
       plt.imshow(predictions[i])
       plt.axis('off')
         
-  plt.savefig('image_at_epoch_{:04d}.png'.format(epoch))
-  plt.show()
+  plt.savefig('images/image_at_epoch_{:04d}.png'.format(epoch))
+  # plt.show()
 from IPython.display import Image
 """Image(filename='image_at_epoch_0060.png') 
 display.Image(filename="dcgan_celebA.gif.png")"""
