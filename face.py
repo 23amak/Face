@@ -280,17 +280,17 @@ def train(dataset, epochs):
     tf.print("Epoch:", epoch, "finished")
     tf.print()
 
-"""file_checkpoint = '/BestModelCKPT'
-tf.keras.callbacks.ModelCheckpoint(
+  """file_checkpoint = '/BestModelCKPT'
+  tf.keras.callbacks.ModelCheckpoint(
     filepath = file_checkpoint, monitor='val_loss', verbose=0, save_best_only=True,
     save_weights_only=False, mode='min', save_freq='epoch',
-    options=None, initial_value_threshold=None,"""
-#)
+    options=None, initial_value_threshold=None,
+)"""
     
     # Save the model every epochs
-checkpoint.save(file_prefix = checkpoint_prefix)
+  checkpoint.save(file_prefix = checkpoint_prefix)
     
-tf.print ('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
+  tf.print ('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
     
   # Generate after the final epoch
 """display.clear_output(wait=True)
