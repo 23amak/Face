@@ -38,12 +38,12 @@ plt.imshow(load_image(path + "000451.jpg"))
 
 train_images = np.array(os.listdir(path))
 np.random.shuffle(train_images)
-BUFFER_SIZE = 50 #200000 #100 #number of images in training i think
+BUFFER_SIZE = 320000 #200000 #100 #number of images in training i think
 BATCH_SIZE = 32 #500 # This is just the standard number for batch size. Google for more info
 # shuffle and batch the data
 # np.random.shuffle(train_images)
-#train_images = np.split(train_images[:BUFFER_SIZE],BATCH_SIZE) 
-train_images = np.split(train_images, BATCH_SIZE) 
+train_images = np.split(train_images[:BUFFER_SIZE],BATCH_SIZE) 
+#train_images = np.split(train_images, BATCH_SIZE) 
 
 
 np.array(train_images).shape
