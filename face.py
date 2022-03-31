@@ -23,6 +23,9 @@ tf.__version__
 
 path = "../img_align_celeba/"
 
+import matplotlib
+matplotlib.use("Agg")
+
 #path = path.map(lambda epoch: epoch / 255.0)
 
 def load_image( infilename ) :
