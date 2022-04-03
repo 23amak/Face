@@ -31,7 +31,7 @@ matplotlib.use("Agg")
 def load_image( infilename ) :
     img = PIL.Image.open( infilename )
     img = img.crop([25,65,153,193])
-    img = img.resize((64,64))
+    img = img.resize((256,256))
     data = np.asarray( img, dtype="int32" )
     return data
 #load_image(path).shape
@@ -216,7 +216,7 @@ seed = tf.random.normal([num_examples_to_generate, noise_dim], seed=1)
 
 seed
 
-EPOCHS = 2000
+EPOCHS = 1000
 
 """
 The training loop begins with generator receiving a random seed as input. 
