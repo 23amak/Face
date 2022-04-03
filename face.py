@@ -236,7 +236,7 @@ def train_step(images):
         new_images.append(new_pic)
     
     images = np.array(new_images)
-    images = images.reshape(images.shape[0], 256, 256, 3).astype('float32') # puts each number in its own numpy array so instead of [1,2,3] gonna be [[1], [2], [3]]
+    images = images.reshape(images.shape[0], 64, 64, 3).astype('float32') # puts each number in its own numpy array so instead of [1,2,3] gonna be [[1], [2], [3]]
     images = (images) / 255 # normalize to [0,1]
     
 
